@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>PHM登录界面</title>
+    <link rel="stylesheet" href="../static/layui/css/layui.css"><!--引入layui文件，-->
+</head>
+<style>
+    .father {
+        width: 1000px;
+        height: auto;
+        margin: 0 auto;
+    }
+
+    .layui-input {
+        width: 300px;
+        line-height: 40px;
+    }
+
+    .login-main {
+        margin-top: 300px;
+        margin-left: 350px;
+        width: 300px;
+        height: 400px; /* border:1px solid #e6e6e6; */
+    }
+
+    .layui-form {
+        margin-top: 20px;
+    }
+
+    button {
+        width: 300px;
+    }
+</style>
+
+<body>
+<div class="father">
+    <div class="login-main">
+        <p style="color:#009688;font-size:25px;text-align:center;">欢迎登陆</p>
+        <form class="layui-form">
+            <div class="layui-input-inline">
+                <input type="text" class="layui-input" name="username" required lay-verify="required"
+                       placeholder="请输入用户名" autocomplete="off"
+                       class="layui-input">
+            </div>
+            <br>
+            <div class="layui-input-inline">
+                <input type="password" name="password" required lay-verify="required" placeholder="请输入密码"
+                       autocomplete="off"
+                       class="layui-input">
+            </div>
+            <br>
+            <div class="layui-input-inline login-btn">
+                <button lay-submit lay-filter="login" class="layui-btn">登录</button>
+            </div>
+            <p>
+                <a href="register" class="fl">立即注册</a>
+                <a href="nopassword" class="fr">忘记密码？</a>
+            </p>
+        </form>
+        <form name="redictForm" action="index/" method="post">
+            {%csrf_token%}
+            <input type="hidden" name="requestParam">
+        </form>
+    </div>
+</div>
+
+<script src="../static/layui/layui.js" charset="utf-8"></script>
+<script src="../static/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="/static/jquery.cookie.js"></script>
+
+<script type="text/javascript">
+    layui.use(['form', 'layer', 'jquery'], function () {
+        // 操作对象
+        var form = layui.form;
+        var $ = layui.jquery;
+        form.on('submit(login)', function (data) {
+            var csrftoken = $.cookie('csrftoken');
+            function csrfSafeMethod(method) {
+                // these HTTP methods do not require CSRF protection
+                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+            }
+
+            $.ajaxSetup({  //设置ajax发送之前做的操作，在data里面加上一个键值对
+                beforeSend: function (xhr, settings) {
+                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+            });
+            {#console.log(data.field);#}
+            $.ajax({
+                url: '/auth/',
+                type: 'POST',
+                data: {
+                    'username': data.field.username,
+                    'password': data.field.password
+                },
+                dataType: "json",
+                success: function (data)
+                {
+                    if (data.username!=0)
+                    {
+                        //location.href="index?name=" + data.username
+                        document.redictForm.requestParam.value=data.username
+                        document.redictForm.submit()
+                    }
+                    else
+                        {
+                         alert('登录名或密码错误');
+                    }
+
+                }
+            })
+
+            return false;
+        })
+
+    })
+</script>
+</body>
+</html>

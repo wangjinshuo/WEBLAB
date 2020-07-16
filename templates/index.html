@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    {% load static %}
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="{% static 'layui/css/layui.css' %}" media="all">
+    <script src="../static/echarts/echarts.js"></script>
+    <title>PHM</title>
+</head>
+
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo">PHM健康管理系统</div>
+        <ul class="layui-nav layui-layout-left">
+            <li class="layui-nav-item">
+                <a style="cursor:pointer;text-decoration:none;" herf="">项目管理</a>
+            </li>
+            <li class="layui-nav-item">
+                <a style="cursor:pointer;text-decoration:none;" herf="">贮存延寿成果管理</a>
+            </li>
+            <li class="layui-nav-item">
+                <a style="cursor:pointer;text-decoration:none;" herf="">数据分析</a>
+            </li>
+        </ul>
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a style="cursor:pointer;text-decoration:none;" herf="javascript:;">
+                    <img class="layui-nav-img" src="../static/image/index.jpeg">
+                    {{ user_name }}
+                </a>
+            </li>
+            <li class="layui-nav-item">
+                <a style="cursor:pointer;text-decoration:none;" herf="">退出</a>
+            </li>
+        </ul>
+    </div>
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <div id="tool_project_namage" style="display: block" class="layui-nav layui-nav-tree">
+                <li class="layui-nav-item">
+                    <a style="cursor:pointer;text-decoration:none;" herf="">新建工程</a>
+                </li>
+                <li class="layui-nav-item">
+                    <a style="cursor:pointer;text-decoration:none;" herf="">贮存基础信息库管理</a>
+                </li>
+                <li class="layui-nav-item">
+                    <a style="cursor:pointer;text-decoration:none;" herf="">失效率数据库管理</a>
+                </li>
+                <li class="layui-nav-item">
+                    <a style="cursor:pointer;text-decoration:none;" herf="">典型贮存环境数据库管理</a>
+                </li>
+            </div>
+            <div id="tool_reslut_namage" style="display: none" class="layui-nav layui-nav-tree">
+                <li class="layui-nav-item">
+                    <a style="cursor:pointer;text-decoration:none;" herf="">新建工程</a>
+                </li>
+                <li class="layui-nav-item">
+                    <a style="cursor:pointer;text-decoration:none;" herf="">元器件信息管理</a>
+                </li>
+                <li class="layui-nav-item">
+                    <a style="cursor:pointer;text-decoration:none;" herf="">贮存延寿信息管理</a>
+                </li>
+            </div>
+            <div id="tool_data_analize" style="display: none" class="layui-nav layui-nav-tree">
+                <li class="layui-nav-item">
+                    <a style="cursor:pointer;text-decoration:none;" herf="">新建工程</a>
+                </li>
+                <li class="layui-nav-item">
+                    <a style="cursor:pointer;text-decoration:none;" herf="">元器件信息管理</a>
+                </li>
+                <li class="layui-nav-item">
+                    <a style="cursor:pointer;text-decoration:none;" herf="">贮存延寿信息管理</a>
+                </li>
+            </div>
+        </div>
+    </div>
+    <div class="layui-body">
+        <div class="layui-card">
+            <div class="layui-card-header">柱形图</div>
+            <div class="layui-card-body">
+                {% csrf_token %}
+                <div id="EchartZhu" style="width: 500px;height: 500px;"></div>
+            </div>
+            <div class="layui-card-header">折线图</div>
+            <div class="layui-card-body">
+                <div id="Echartline" style="width: 500px;height: 500px;"></div>
+            </div>
+            <div class="layui-card-header">饼图</div>
+            <div class="layui-card-body">
+                <div id="Echartpie" style="width: 500px;height: 500px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-footer">
+        © http://www.spacenovo.com/ -- 北京九天翱翔科技有限公司
+    </div>
+</div>
+
+<script src="../static/layui/layui.js" charset="utf-8"></script>
+<script src="../static/layui/mjs.js" charset="utf-8"></script>
+<script src="../static/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="/static/jquery.cookie.js"></script>
+<script>
+    layui.config(
+        {
+            base: '../static/echarts/'
+        }
+    ).extend({echarts: 'echarts'}).use(['element', 'echarts'], function () {
+        var element = layui.element,
+            $ = layui.jquery,
+            echarts = layui.echarts;
+        var chartZhu = echarts.init(document.getElementById('EchartZhu'));
+        var chartline = echarts.init(document.getElementById('Echartline'));
+        var chartpie = echarts.init(document.getElementById('Echartpie'));
+        //指定图表配置项和数据
+        var optionchart = {
+            title: {
+                text: '小说阅读量'
+            },
+            tooltip: {},
+            legend: {
+                data: []
+            },
+            xAxis: {
+                data: []
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                name: '阅读量',
+                type: 'bar', //柱状
+                data: [],
+                itemStyle: {
+                    normal: { //柱子颜色
+                        color: 'red'
+                    }
+                },
+            }]
+        };
+        var optionchartZhe = {
+            title: {
+                text: '商品订单'
+            },
+            tooltip: {},
+            legend: { //顶部显示 与series中的数据类型的name一致
+                data: ['销量', '产量', '营业额', '单价']
+            },
+            xAxis: {
+                // type: 'category',
+                // boundaryGap: false, //从起点开始
+                data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                name: '销量',
+                type: 'line', //线性
+                data: [145, 230, 701, 734, 1090, 1130, 1120],
+            }, {
+                name: '产量',
+                type: 'line', //线性
+                data: [720, 832, 801, 834, 1190, 1230, 1220],
+            }, {
+                smooth: true, //曲线 默认折线
+                name: '营业额',
+                type: 'line', //线性
+                data: [820, 932, 901, 934, 1290, 1330, 1320],
+            }, {
+                smooth: true, //曲线
+                name: '单价',
+                type: 'line', //线性
+                data: [220, 332, 401, 534, 690, 730, 820],
+            }]
+        };
+        var optionchartBing = {
+            title: {
+                text: '商品订单',
+                subtext: '纯属虚构', //副标题
+                x: 'center' //标题居中
+            },
+            tooltip: {
+                // trigger: 'item' //悬浮显示对比
+            },
+            legend: {
+                orient: 'vertical', //类型垂直,默认水平
+                left: 'left', //类型区分在左 默认居中
+                data: ['单价', '总价', '销量', '产量']
+            },
+            series: [{
+                type: 'pie', //饼状
+                radius: '60%', //圆的大小
+                center: ['50%', '50%'], //居中
+                data: [{
+                    value: 335,
+                    name: '单价'
+                },
+                    {
+                        value: 310,
+                        name: '总价'
+                    },
+                    {
+                        value: 234,
+                        name: '销量'
+                    },
+                    {
+                        value: 135,
+                        name: '产量'
+                    }
+                ]
+            }]
+        };
+        chartZhu.setOption(optionchart, true);
+        chartline.setOption(optionchartZhe, true);
+        chartpie.setOption(optionchartBing, true);
+        //ajax动态刷新echart界面
+        var csrftoken = $.cookie('csrftoken');
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({  //设置ajax发送之前做的操作，在data里面加上一个键值对
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+        var names = [];
+        var nums = [];
+        $.ajax({
+                type: 'post',
+                async: true,
+                url: '/TestServlet/',
+                data: {},
+                dataType: 'json',
+                success: function (result) {
+                    if (result) {
+                        alert("请求成功！");
+                        for (var i = 0; i < result.name.length; i++) {
+                            names.push(result.name[i]);
+                        }
+                        for (var i = 0; i < result.num.length; i++) {
+                            nums.push(result.num[i]);
+                        }
+                        chartZhu.hideLoading();
+                        chartZhu.setOption({
+                            xAxis: {
+                                data: names
+                            },
+                            yAxis: {
+                                type: 'value'
+                            },
+                            series: [{
+                                name: '阅读量',
+                                data: nums
+                            }]
+                        })
+                        ;
+                    }
+                },
+                error: function () {
+                    alert("请求数据失败!");
+                    chartZhu.hideLoading();
+                }
+            }
+        )
+    })
+</script>
+<script>
+    layui.use('element', function () {
+        var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
+        //监听导航点击
+        element.on('nav', function (elem) {
+            switch_tool_bar(elem.text());
+        });
+    });
+</script>
+</body>
+</html>
