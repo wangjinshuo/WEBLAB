@@ -63,4 +63,5 @@ def test_spark(request):
     a=hive_context.sql("select * from student").collect()[0]
     print(a['name'])
     sc.stop()
+    
     return HttpResponse(a)
