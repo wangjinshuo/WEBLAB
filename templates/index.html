@@ -233,9 +233,11 @@
                 }
             }
         });
-        var names = [];
-        var nums = [];
-        $.ajax({
+
+        var timer=setInterval(function(){
+            var names = [];
+            var nums = [];
+            $.ajax({
                 type: 'post',
                 async: true,
                 url: '/TestServlet/',
@@ -243,7 +245,7 @@
                 dataType: 'json',
                 success: function (result) {
                     if (result) {
-                        alert("请求成功！");
+                        {#alert("请求成功！");#}
                         for (var i = 0; i < result.name.length; i++) {
                             names.push(result.name[i]);
                         }
@@ -267,11 +269,14 @@
                     }
                 },
                 error: function () {
-                    alert("请求数据失败!");
+                    {#alert("请求数据失败!");#}
                     chartZhu.hideLoading();
                 }
             }
         )
+        },1000); //每隔1秒执行一次这个函数
+
+
     })
 </script>
 <script>
